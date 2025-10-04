@@ -34,24 +34,36 @@ uniapp/
 ├── data_manager.py     # Data persistence layer
 ├── cli_app.py          # Command Line Interface
 ├── gui_app.py          # Graphical User Interface
-├── requirements.txt    # Python dependencies
-├── README.md          # This file
-├── class_diagram.md   # UML class diagram documentation
-└── students.data      # Student data file (created automatically)
+├── pyproject.toml     # Project configuration and dependencies
+├── uv.lock            # Dependency lock file
+├── students.data      # Student data file (created automatically)
+├── .gitignore         # Git ignore rules
+└── README.md          # This file
 ```
 
 ## Installation and Setup
 
 1. **Clone or download the project**
-2. **Ensure Python 3.7+ is installed**
-3. **No additional dependencies required** (uses only Python standard library)
+2. **Ensure Python 3.12+ is installed**
+3. **Install uv** (if not already installed):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+4. **Install dependencies**:
+   ```bash
+   uv sync
+   ```
+5. **Run the application**:
+   ```bash
+   uv run main.py
+   ```
 
 ## Usage
 
 ### Running the Application
 
 ```bash
-python main.py
+uv run main.py
 ```
 
 Choose your preferred interface:
@@ -66,7 +78,7 @@ The CLI application provides a menu-driven interface:
 2. **Student Login**: Access student features
 3. **Admin Login**: Access admin features
 4. **Student Operations**:
-   - Enroll in subjects
+   - Enroll in random subjects
    - Remove subjects
    - View enrollments
    - Change password
@@ -79,13 +91,14 @@ The CLI application provides a menu-driven interface:
 
 ### GUI Application
 
-The GUI application provides a modern graphical interface:
+The GUI application provides a modern graphical interface designed exclusively for registered students (Assessment 1 - Part 2):
 
-1. **Login Window**: Main window for authentication
-2. **Registration Dialog**: Student registration form
-3. **Enrollment Window**: Tabbed interface with:
-   - Subject enrollment tab
-   - Enrollment management tab
+1. **Login Window**: Main window for student authentication (registered students only)
+2. **Enrollment Window**: Tabbed interface with:
+   - **Random Enrollment Tab**: One-click enrollment in random subjects
+   - **View Enrollments Tab**: View and manage current enrollments
+3. **Student Information Display**: Shows student ID, email, and enrollment status
+4. **Enrollment Management**: Remove subjects from enrollment list
 
 ## Data Validation Rules
 
@@ -139,21 +152,18 @@ The application includes comprehensive error handling for:
 ## Sample Data
 
 The application comes pre-loaded with sample subjects:
-- CSE101: Introduction to Programming
-- CSE102: Data Structures
-- CSE201: Software Engineering
-- CSE301: Database Systems
-- CSE401: Machine Learning
-- MATH101: Calculus I
-- MATH102: Calculus II
-- PHYS101: Physics I
-- CHEM101: Chemistry I
-- ENG101: English Composition
+- 101: Introduction to Programming
+- 102: Data Structures
+- 201: Software Engineering
+- 301: Database Systems
+- 401: Machine Learning
+- 111: Calculus I
+- 112: Calculus II
+- 121: Physics I
+- 131: Chemistry I
+- 141: English Composition
 
 ## Technical Architecture
-
-### Class Diagram
-See `class_diagram.md` for detailed UML class diagram and relationships.
 
 ### Key Classes
 - **Student**: Core student entity with enrollment management
@@ -168,7 +178,8 @@ See `class_diagram.md` for detailed UML class diagram and relationships.
 
 ## Development Notes
 
-- Built using Python 3.7+ standard library
+- Built using Python 3.12+ standard library
+- Package management with uv
 - GUI implemented with tkinter
 - Object-oriented design with clear separation of concerns
 - Comprehensive error handling and user feedback
