@@ -30,8 +30,20 @@ A comprehensive university enrollment system built with Python, featuring both C
 ```
 uniapp/
 ├── main.py              # Main entry point
-├── models.py            # Core data models and business logic
-├── data_manager.py     # Data persistence layer
+├── models/              # Core data models and business logic
+│   ├── enum/
+│   │   └── roles.py     # User role enumerations
+│   ├── auth.py          # Authentication service
+│   ├── session.py       # Session management
+│   ├── session_manager.py # Global session manager
+│   ├── validation.py    # Input validation service
+│   ├── grading.py       # Grade calculation service
+│   ├── subject.py       # Subject/course model
+│   ├── enrollment.py    # Student enrollment model
+│   ├── student.py       # Student model
+│   └── admin.py         # Administrator model
+├── repository/          # Data persistence layer
+│   └── data_manager.py  # Data manager for file operations
 ├── cli_app.py          # Command Line Interface
 ├── gui_app.py          # Graphical User Interface
 ├── pyproject.toml     # Project configuration and dependencies

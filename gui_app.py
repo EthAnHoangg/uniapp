@@ -10,7 +10,7 @@ from models.student import Student
 from models.subject import Subject
 from models.validation import ValidationService
 from models.session_manager import SessionManager
-from data_manager import DataManager
+from repository.data_manager import DataManager
 
 
 class GUIUniApp:
