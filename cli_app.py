@@ -4,7 +4,12 @@ Command-line interface for the university enrollment system.
 """
 
 from typing import List, Optional
-from models import Student, Subject, Admin, ValidationService, SessionManager, UserRole
+from models.student import Student
+from models.subject import Subject
+from models.admin import Admin
+from models.validation import ValidationService
+from models.session_manager import SessionManager
+from models.enum.roles import UserRole
 from data_manager import DataManager
 
 

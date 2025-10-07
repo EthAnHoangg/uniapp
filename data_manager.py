@@ -6,7 +6,8 @@ Handles file operations for students.data persistence.
 import json
 import os
 from typing import List, Dict, Optional
-from models import Student, Enrollment
+from models.student import Student
+from models.enrollment import Enrollment
 
 
 class DataManager:
