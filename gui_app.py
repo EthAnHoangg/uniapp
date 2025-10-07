@@ -6,8 +6,11 @@ Graphical user interface for the university enrollment system.
 import tkinter as tk
 from tkinter import ttk, messagebox
 from typing import List, Optional
-from models import Student, Subject, ValidationService, SessionManager
-from data_manager import DataManager
+from models.student import Student
+from models.subject import Subject
+from models.validation import ValidationService
+from models.session_manager import SessionManager
+from repository.data_manager import DataManager
 
 
 class GUIUniApp:
