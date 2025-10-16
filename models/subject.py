@@ -25,5 +25,4 @@ class Subject:
             'description': self.description,
             'credits': str(self.credits)
         }
-
-
+print()
