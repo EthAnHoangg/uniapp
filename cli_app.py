@@ -252,7 +252,7 @@ class CLIUniApp:
         
         if current_student.remove_subject(subject_id):
             self.data_manager.save_data(self.students)
-            print(indent + self._c(f"Droping Subject-{subject_id}", self.Color.YELLOW))
+            print(indent + self._c(f"Dropping Subject-{subject_id}", self.Color.YELLOW))
             print(indent + self._c(f"You are now enrolled in {len(current_student.enrollments)} out of 4 subjects", self.Color.YELLOW))
         else:
             print(indent + self._c("Failed to remove subject.", self.Color.RED))
