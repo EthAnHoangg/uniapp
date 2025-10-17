@@ -1,0 +1,38 @@
+[
+  {
+    "student_id": "397868",
+    "name": "joy",
+    "email": "123456@university.com",
+    "password_hash": "c073c9d0f988954dd435673f888d97af:abd4879e54a362ba8b979ad444e66d72a050bc1b08e410675a793bd23228f9b0",
+    "enrollments": [
+      {
+        "student_id": "397868",
+        "subject_id": "111",
+        "mark": 52,
+        "grade": "P",
+        "enrollment_date": "2025-10-17T12:22:54.560302"
+      },
+      {
+        "student_id": "397868",
+        "subject_id": "141",
+        "mark": 70,
+        "grade": "C",
+        "enrollment_date": "2025-10-17T12:22:57.229981"
+      },
+      {
+        "student_id": "397868",
+        "subject_id": "102",
+        "mark": 41,
+        "grade": "Z",
+        "enrollment_date": "2025-10-17T12:23:00.191879"
+      },
+      {
+        "student_id": "397868",
+        "subject_id": "401",
+        "mark": 44,
+        "grade": "Z",
+        "enrollment_date": "2025-10-17T12:23:10.507659"
+      }
+    ]
+  }
+]

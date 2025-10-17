@@ -11,6 +11,8 @@ from models.validation import ValidationService
 from models.session_manager import SessionManager
 from models.enum.roles import UserRole
 from repository.data_manager import DataManager
+from colorama import Fore, Style, init
+init(autoreset=True) 
 
 
 class CLIUniApp:
@@ -68,28 +70,79 @@ class CLIUniApp:
         return None
     
     def run(self):
-        """Main application loop"""
-        print("=" * 60)
-        print("Welcome to CLI University Enrollment System")
-        print("=" * 60)
-        
+        """Main application loop with precise color formatting"""
+
+    
+        print(Fore.YELLOW + "Starting CLI Application...\n")
+
+    
+        print(Fore.MAGENTA + "University Enrollment System")
+        print(Fore.CYAN + "=" * 60)
+
         while True:
-            print("\nUniversity System")
-            print("(A) Admin")
-            print("(S) Student")
-            print("(X) Exit")
+        
+            choice = input(
+                Fore.CYAN + "University System: "
+                + Fore.CYAN + "(A)"
+                + Fore.CYAN + "dmin, "
+                + Fore.CYAN + "(S)"
+                + Fore.CYAN + "tudent, or "
+                + Fore.CYAN + "X"
+                + Fore.CYAN + " : "
+                + Style.RESET_ALL
+            ).strip().lower()
+
+            if choice == "a":
             
-            choice = input("\nEnter your choice: ").strip().upper()
+                while True:
+                    admin_choice = input(
+                        Fore.CYAN + "Admin System "
+                        + Fore.CYAN + "(c/g/p/r/s/x)"
+                        + Fore.CYAN + ": "
+                        + Style.RESET_ALL
+                    ).strip().lower()
+
+                    if admin_choice == "x":
+                        break
+                    elif admin_choice == "c":
+                        self._clear_all_data()
+                    elif admin_choice == "g":
+                        self._view_students_by_grade()
+                    elif admin_choice == "p":
+                        self._categorize_students()
+                    elif admin_choice == "r":
+                        self._remove_student()
+                    elif admin_choice == "s":
+                        self._view_all_students()
+                    else:
+                        print(Fore.RED + "Invalid option. Try again.")
+
+            elif choice == "s":
             
-            if choice == "A":
-                self._admin_system()
-            elif choice == "S":
-                self._student_system()
-            elif choice == "X":
-                print("Thank you for using CLI University Enrollment System!")
+                while True:
+                    student_choice = input(
+                        Fore.CYAN + "Student System "
+                        + Fore.CYAN  + "(l/r/x)"
+                        + Fore.CYAN + ": "
+                        + Style.RESET_ALL
+                    ).strip().lower()
+
+                    if student_choice == "x":
+                        break
+                    elif student_choice == "l":
+                        self._student_login()
+                    elif student_choice == "r":
+                        self._student_registration()
+                    else:
+                        print(Fore.RED + "Invalid option. Try again.")
+
+            elif choice == "x":
+                print(Fore.YELLOW + "Thank You" + Style.RESET_ALL)
                 break
+
             else:
-                print("Invalid choice. Please try again.")
+                print(Fore.RED + "Invalid choice. Try again.")
+
     
     def _admin_system(self):
         """Admin system - direct access without login"""
@@ -119,54 +172,80 @@ class CLIUniApp:
                 break
             else:
                 print("Invalid choice. Please try again.")
-    
-    def _student_login(self):
-        """Handle student login"""
-        print("\n" + "=" * 40)
-        print("Student Login")
-        print("=" * 40)
-        
-        email = input("Enter email: ").strip()
-        password = input("Enter password: ").strip()
-        
-        # Authenticate student using session manager
-        if self.session_manager.login_student(email, password, self.students):
-            session = self.session_manager.get_current_session()
-            print(f"Welcome, {session.user_name}!")
-            self._subject_enrolment_system()
-        else:
-            print("Invalid email or password.")
-    
+             
     def _student_registration(self):
-        """Handle student registration"""
-        print("\n" + "=" * 40)
-        print("Student Registration")
-        print("=" * 40)
+        """Handle student registration with colored output"""
+        print(Fore.GREEN + "Student Sign Up")
+
         
-        name = input("Enter full name: ").strip()
-        email = input("Enter email (must end with @university.com): ").strip()
-        password = input("Enter password (Uppercase start, 5+ letters, 3+ digits): ").strip()
-        
-        # Centralized validation
-        validation_result = self.validation_service.validate_student_registration(name, email, password, self.students)
-        if not validation_result['valid']:
-            print(validation_result['error'])
-            return
-        
-        # Generate unique student ID
-        existing_ids = [s.student_id for s in self.students]
-        student_id = self.validation_service.generate_student_id(existing_ids)
-        
-        # Create new student with hashed password
-        new_student = Student.create_student(student_id, name, email, password)
-        self.students.append(new_student)
-        
-        # Save to file
-        if self.data_manager.save_data(self.students):
-            print(f"Registration successful! Your student ID is: {student_id}")
-        else:
-            print("Registration failed. Please try again.")
-            self.students.remove(new_student)
+        while True:
+            email = input(Fore.WHITE + "Email: ").strip()
+            password = input(Fore.WHITE + "Password: ").strip()
+
+            
+            valid_email = email.endswith("@university.com")
+            valid_password = (
+                len(password) >= 8 and password[0].isupper()
+                and sum(ch.isdigit() for ch in password) >= 3
+                and sum(ch.isalpha() for ch in password) >= 5
+            )
+
+            if not valid_email or not valid_password:
+                print(Fore.RED + "Incorrect email or password format\n")
+                continue
+            else:
+                print(Fore.YELLOW + "email and password formats acceptable")
+
+            
+            for student in self.students:
+                if student.email == email:
+                    print(Fore.RED + f"Student {student.name} already exists\n")
+                    return
+
+            
+            name = input(Fore.WHITE + "Name: ").strip()
+            print(Fore.GREEN + f"Enrolling student {name}")
+
+            new_student = Student.create_student(name, email, password)
+            self.students.append(new_student)
+            self.data_manager.save_data(self.students)
+            print(Fore.GREEN + "Student registration successful!\n")
+            break
+
+
+    def _student_login(self):
+        """Handle student login with colored feedback"""
+        print(Fore.GREEN + "Student Sign In")
+
+        while True:
+            email = input(Fore.WHITE + "Email: ").strip()
+            password = input(Fore.WHITE + "Password: ").strip()
+
+            valid_email = email.endswith("@university.com")
+            valid_password = (
+                len(password) >= 8 and password[0].isupper()
+                and sum(ch.isdigit() for ch in password) >= 3
+                and sum(ch.isalpha() for ch in password) >= 5
+            )
+
+            if not valid_email or not valid_password:
+                print(Fore.RED + "Incorrect email or password format\n")
+                continue
+            else:
+                print(Fore.YELLOW + "email and password formats acceptable")
+
+            
+            login_success = self.session_manager.login_student(email, password, self.students)
+
+            if login_success:
+                current_student = next((s for s in self.students if s.email == email), None)
+                
+                self._subject_enrolment_system()
+                break
+            else:
+                print(Fore.RED + "Student does not exist\n")
+                return
+
     
     def _subject_enrolment_system(self):
         """Subject Enrolment System operations menu"""
