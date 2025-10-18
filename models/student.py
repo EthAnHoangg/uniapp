@@ -15,7 +15,6 @@ class Student:
         self.email = email
         self.password_hash = password_hash
         self.enrollments: List[Enrollment] = []
-    
     @classmethod
     def create_student(cls, student_id: str, name: str, email: str, password: str) -> 'Student':
         """Factory method to create a new student with password hashing"""

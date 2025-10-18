@@ -577,12 +577,12 @@ class CLIUniApp:
         """Clear entire students.data file (formatted exactly like screenshot)"""
         admin = Admin("admin", "System Admin", "IT Department")
 
-    # 黄色标题，与截图一致
+    
         print(Fore.YELLOW + "Clearing students database" + Style.RESET_ALL)
 
-    # 红色确认提示
+    
         confirm = input(Fore.RED + "Are you sure you want to clear the database (Y)ES/(N)O: " + Style.RESET_ALL).strip().lower()
-    # 逻辑判断
+    
         if confirm == "y":
             if admin.clear_all(self.students):
                 self.data_manager.clear_data()
@@ -590,7 +590,7 @@ class CLIUniApp:
             else:
                 print(Fore.RED + "Failed to clear data." + Style.RESET_ALL)
        
-        # 红色提示（与截图风格一致）
+        
            
 
 
