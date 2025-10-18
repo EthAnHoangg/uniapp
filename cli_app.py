@@ -11,6 +11,8 @@ from models.validation import ValidationService
 from models.session_manager import SessionManager
 from models.enum.roles import UserRole
 from repository.data_manager import DataManager
+from colorama import Fore, Style, init
+init(autoreset=True) 
 
 
 class CLIUniApp:
@@ -68,28 +70,79 @@ class CLIUniApp:
         return None
     
     def run(self):
-        """Main application loop"""
-        print("=" * 60)
-        print("Welcome to CLI University Enrollment System")
-        print("=" * 60)
-        
+        """Main application loop with precise color formatting"""
+
+    
+        print(Fore.YELLOW + "Starting CLI Application...\n")
+
+    
+        print(Fore.MAGENTA + "University Enrollment System")
+        print(Fore.CYAN + "=" * 60)
+
         while True:
-            print("\nUniversity System")
-            print("(A) Admin")
-            print("(S) Student")
-            print("(X) Exit")
+        
+            choice = input(
+                Fore.CYAN + "University System: "
+                + Fore.CYAN + "(A)"
+                + Fore.CYAN + "dmin, "
+                + Fore.CYAN + "(S)"
+                + Fore.CYAN + "tudent, or "
+                + Fore.CYAN + "X"
+                + Fore.CYAN + " : "
+                + Style.RESET_ALL
+            ).strip().lower()
+
+            if choice == "a":
             
-            choice = input("\nEnter your choice: ").strip().upper()
+                while True:
+                    admin_choice = input(
+                        Fore.CYAN + "Admin System "
+                        + Fore.CYAN + "(c/g/p/r/s/x)"
+                        + Fore.CYAN + ": "
+                        + Style.RESET_ALL
+                    ).strip().lower()
+
+                    if admin_choice == "x":
+                        break
+                    elif admin_choice == "c":
+                        self._clear_all_data()
+                    elif admin_choice == "g":
+                        self._view_students_by_grade()
+                    elif admin_choice == "p":
+                        self._categorize_students()
+                    elif admin_choice == "r":
+                        self._remove_student()
+                    elif admin_choice == "s":
+                        self._view_all_students()
+                    else:
+                        print(Fore.RED + "Invalid option. Try again.")
+
+            elif choice == "s":
             
-            if choice == "A":
-                self._admin_system()
-            elif choice == "S":
-                self._student_system()
-            elif choice == "X":
-                print("Thank you for using CLI University Enrollment System!")
+                while True:
+                    student_choice = input(
+                        Fore.CYAN + "Student System "
+                        + Fore.CYAN  + "(l/r/x)"
+                        + Fore.CYAN + ": "
+                        + Style.RESET_ALL
+                    ).strip().lower()
+
+                    if student_choice == "x":
+                        break
+                    elif student_choice == "l":
+                        self._student_login()
+                    elif student_choice == "r":
+                        self._student_registration()
+                    else:
+                        print(Fore.RED + "Invalid option. Try again.")
+
+            elif choice == "x":
+                print(Fore.YELLOW + "Thank You" + Style.RESET_ALL)
                 break
+
             else:
-                print("Invalid choice. Please try again.")
+                print(Fore.RED + "Invalid choice. Try again.")
+
     
     def _admin_system(self):
         """Admin system - direct access without login"""
@@ -119,69 +172,90 @@ class CLIUniApp:
                 break
             else:
                 print("Invalid choice. Please try again.")
-    
-    def _student_login(self):
-        """Handle student login"""
-        print("\n" + "=" * 40)
-        print("Student Login")
-        print("=" * 40)
-        
-        email = input("Enter email: ").strip()
-        password = input("Enter password: ").strip()
-        
-        # Authenticate student using session manager
-        if self.session_manager.login_student(email, password, self.students):
-            session = self.session_manager.get_current_session()
-            print(f"Welcome, {session.user_name}!")
-            self._subject_enrolment_system()
-        else:
-            print("Invalid email or password.")
-    
+             
     def _student_registration(self):
-        """Handle student registration"""
-        print("\n" + "=" * 40)
-        print("Student Registration")
-        print("=" * 40)
+        """Handle student registration with colored output"""
+        print(Fore.GREEN + "Student Sign Up")
+
         
-        name = input("Enter full name: ").strip()
-        email = input("Enter email (must end with @university.com): ").strip()
-        password = input("Enter password (Uppercase start, 5+ letters, 3+ digits): ").strip()
-        
-        # Centralized validation
-        validation_result = self.validation_service.validate_student_registration(name, email, password, self.students)
-        if not validation_result['valid']:
-            print(validation_result['error'])
-            return
-        
-        # Generate unique student ID
-        existing_ids = [s.student_id for s in self.students]
-        student_id = self.validation_service.generate_student_id(existing_ids)
-        
-        # Create new student with hashed password
-        new_student = Student.create_student(student_id, name, email, password)
-        self.students.append(new_student)
-        
-        # Save to file
-        if self.data_manager.save_data(self.students):
-            print(f"Registration successful! Your student ID is: {student_id}")
-        else:
-            print("Registration failed. Please try again.")
-            self.students.remove(new_student)
+        while True:
+            email = input(Fore.WHITE + "Email: ").strip()
+            password = input(Fore.WHITE + "Password: ").strip()
+
+            
+            valid_email = email.endswith("@university.com")
+            valid_password = (
+                len(password) >= 8 and password[0].isupper()
+                and sum(ch.isdigit() for ch in password) >= 3
+                and sum(ch.isalpha() for ch in password) >= 5
+            )
+
+            if not valid_email or not valid_password:
+                print(Fore.RED + "Incorrect email or password format\n")
+                continue
+            else:
+                print(Fore.YELLOW + "email and password formats acceptable")
+
+            
+            for student in self.students:
+                if student.email == email:
+                    print(Fore.RED + f"Student {student.name} already exists\n")
+                    return
+
+            
+            name = input(Fore.WHITE + "Name: ").strip()
+            print(Fore.YELLOW + f"Enrolling student {name}")
+            existing_ids = [s.student_id for s in self.students]
+            student_id = self.validation_service.generate_student_id(existing_ids)
+
+            new_student = Student.create_student(student_id, name, email, password)
+            self.students.append(new_student)
+            self.data_manager.save_data(self.students)
+            
+            break
+
+
+    def _student_login(self):
+        """Handle student login with colored feedback"""
+        print(Fore.GREEN + "Student Sign In")
+
+        while True:
+            email = input(Fore.WHITE + "Email: ").strip()
+            password = input(Fore.WHITE + "Password: ").strip()
+
+            valid_email = email.endswith("@university.com")
+            valid_password = (
+                len(password) >= 8 and password[0].isupper()
+                and sum(ch.isdigit() for ch in password) >= 3
+                and sum(ch.isalpha() for ch in password) >= 5
+            )
+
+            if not valid_email or not valid_password:
+                print(Fore.RED + "Incorrect email or password format\n")
+                continue
+            else:
+                print(Fore.YELLOW + "email and password formats acceptable")
+
+            
+            login_success = self.session_manager.login_student(email, password, self.students)
+
+            if login_success:
+                current_student = next((s for s in self.students if s.email == email), None)
+                
+                self._subject_enrolment_system()
+                break
+            else:
+                print(Fore.RED + "Student does not exist\n")
+                return
+
     
     def _subject_enrolment_system(self):
         """Subject Enrolment System operations menu"""
         while self.session_manager.is_logged_in() and self.session_manager.get_current_user_role() == UserRole.STUDENT:
-            print("\n" + "=" * 40)
-            print("Subject Enrolment System")
-            print("=" * 40)
-            print("(c) change: Change the password")
-            print("(e) enrol: Enrol in a random subject")
-            print("(r) remove: Remove a subject from the enrolment list")
-            print("(s) show: Shows the enrolled subjects with their marks and grades")
-            print("(x) exit")
             
-            choice = input("\nEnter your choice: ").strip().lower()
-            
+            choice = input(Fore.CYAN + "Student Course Menu (c/e/r/s/x): " + Style.RESET_ALL).strip().lower()
+
+
             if choice == "c":
                 self._change_password()
             elif choice == "e":
@@ -192,105 +266,156 @@ class CLIUniApp:
                 self._view_enrollments()
             elif choice == "x":
                 self.session_manager.logout()
-                print("Logged out successfully.")
+                print(Fore.GREEN + "Logged out successfully." + Style.RESET_ALL)
                 break
             else:
-                print("Invalid choice. Please try again.")
+                print(Fore.RED + "Invalid choice. Please try again." + Style.RESET_ALL)
+
     
     def _enroll_subject(self):
-        """Enroll in a random subject"""
-        # Get current student from session
+        """Enroll in a random subject with colored CLI feedback"""
         current_student = self._get_current_student()
         if not current_student:
-            print("Session expired. Please log in again.")
+            print(Fore.RED + "Session expired. Please log in again." + Style.RESET_ALL)
             return
-        
+    
         # Check enrollment limit
         if len(current_student.enrollments) >= 4:
-            print("You have reached the maximum enrollment limit of 4 subjects.")
+            print(Fore.RED + "Students are allowed to enroll in 4 subjects only." + Style.RESET_ALL)
             return
-            
-        print("\nEnrolling in a random subject...")
-        
-        # Enroll in a random subject
-        enrolled_subject = current_student.enroll_random(self.subjects)
-        
-        if enrolled_subject:
-            self.data_manager.save_data(self.students)
-            print(f"Successfully enrolled in {enrolled_subject.name} (ID: {enrolled_subject.subject_id})!")
-        else:
-            print("No subjects available for enrollment. You may already be enrolled in all available subjects.")
     
+        
+        print(Fore.CYAN + "Enrolling in a random subject..." + Style.RESET_ALL)
+
+        
+        enrolled_subject = current_student.enroll_random(self.subjects)
+
+        if enrolled_subject:
+            
+            self.data_manager.save_data(self.students)
+
+        
+            print(
+                Fore.YELLOW
+                + f"Enrolling in Subject-{enrolled_subject.subject_id}"
+                + Style.RESET_ALL
+            )
+
+            print(
+                Fore.YELLOW
+                + f"You are now enrolled in {len(current_student.enrollments)} out of 4 subjects"
+                + Style.RESET_ALL
+            )
+
+        else:
+            print(
+                Fore.RED
+                + "No subjects available for enrollment. You may already be enrolled in all available subjects."
+                + Style.RESET_ALL
+            )
+
     def _remove_subject(self):
-        """Remove a subject from enrollment"""
+        """Remove a subject from enrollment (formatted exactly like screenshot)"""
         current_student = self._get_current_student()
         if not current_student:
-            print("Session expired. Please log in again.")
+            print(Fore.RED + "Session expired. Please log in again." + Style.RESET_ALL)
             return
-            
+
         enrollments = current_student.view_enrollments()
-        
         if not enrollments:
-            print("No enrollments found.")
+            print(Fore.RED + "No enrollments found." + Style.RESET_ALL)
             return
-        
-        print("\nCurrent Enrollments:")
-        for i, enrollment in enumerate(enrollments, 1):
-            subject_name = next((s.name for s in self.subjects if s.subject_id == enrollment['subject_id']), "Unknown")
-            print(f"{i}. {enrollment['subject_id']} - {subject_name} (Mark: {enrollment['mark']}, Grade: {enrollment['grade']})")
+
         
         try:
-            choice = int(input("\nSelect enrollment to remove: ")) - 1
-            if 0 <= choice < len(enrollments):
-                subject_id = enrollments[choice]['subject_id']
-                
-                if current_student.remove_subject(subject_id):
-                    self.data_manager.save_data(self.students)
-                    print("Subject removed successfully!")
-                else:
-                    print("Failed to remove subject.")
+            subject_id = input( "Remove Subject by ID: " + Style.RESET_ALL).strip()
+
+            
+            existing_ids = [e["subject_id"] for e in enrollments]
+            if subject_id not in existing_ids:
+                print(Fore.RED + f"Subject ID {subject_id} not found." + Style.RESET_ALL)
+                return
+
+            
+            removed = current_student.remove_subject(subject_id)
+            if removed:
+                self.data_manager.save_data(self.students)
+
+             
+                print(Fore.YELLOW + f"Droping Subject-{subject_id}" + Style.RESET_ALL)
+                print(
+                    Fore.GREEN
+                    + f"You are now enrolled in {len(current_student.enrollments)} out of 4 subjects"
+                    + Style.RESET_ALL
+                )
             else:
-                print("Invalid selection.")
-        except ValueError:
-            print("Please enter a valid number.")
+                print(Fore.RED + "Failed to remove subject." + Style.RESET_ALL)
+
+        except Exception as e:
+            print(Fore.RED + f"Error: {str(e)}" + Style.RESET_ALL)
+
     
     def _view_enrollments(self):
-        """View current enrollments"""
+        """View current enrollments (formatted exactly like screenshot)"""
         current_student = self._get_current_student()
         if not current_student:
-            print("Session expired. Please log in again.")
+            print(Fore.RED + "Session expired. Please log in again." + Style.RESET_ALL)
             return
-            
+
         enrollments = current_student.view_enrollments()
+
         
         if not enrollments:
-            print("No enrollments found.")
+            print(Fore.YELLOW + "Showing 0 subjects" + Style.RESET_ALL)
             return
+
         
-        print("\nCurrent Enrollments:")
-        print("-" * 60)
-        print(f"{'Subject ID':<12} {'Subject Name':<20} {'Mark':<6} {'Grade':<6}")
-        print("-" * 60)
+        print(Fore.YELLOW + f"Showing {len(enrollments)} subjects" + Style.RESET_ALL)
+
         
         for enrollment in enrollments:
-            subject_name = next((s.name for s in self.subjects if s.subject_id == enrollment['subject_id']), "Unknown")
-            print(f"{enrollment['subject_id']:<12} {subject_name:<20} {enrollment['mark']:<6} {enrollment['grade']:<6}")
+            subject_id = enrollment["subject_id"]
+            mark = enrollment["mark"]
+            grade = enrollment["grade"]
+            print(               
+                 f"[ Subject::{subject_id} -- mark = {mark} -- grade =  {grade} ]"
+                + Style.RESET_ALL
+            )
+
     
     def _change_password(self):
-        """Change student password"""
+        """Change student password (no old password required, formatted like screenshot)"""
         current_student = self._get_current_student()
         if not current_student:
-            print("Session expired. Please log in again.")
+            print(Fore.RED + "Session expired. Please log in again." + Style.RESET_ALL)
             return
-            
-        old_password = input("Enter current password: ").strip()
-        new_password = input("Enter new password: ").strip()
-        
-        if current_student.change_password(old_password, new_password, self.validation_service):
-            self.data_manager.save_data(self.students)
-            print("Password changed successfully!")
-        else:
-            print("Password change failed. Check your current password and new password format.")
+
+    
+        print(Fore.YELLOW + "Updating Password" + Style.RESET_ALL)
+
+    
+        new_password = input("New Password: ").strip()
+        confirm_password = input("Confirm Password: ").strip()
+
+    
+        if new_password != confirm_password:
+            print(Fore.RED + "Password does not match - try again" + Style.RESET_ALL)
+            return
+
+    
+        if not self.validation_service.validate_password(new_password):
+            print(Fore.RED + "Invalid password format - must start with uppercase, include letters and digits" + Style.RESET_ALL)
+            return
+
+    
+        from models.auth import AuthenticationService
+        current_student.password_hash = AuthenticationService.hash_password(new_password)
+
+    
+        self.data_manager.save_data(self.students)
+       
+
+
     
     def _admin_menu(self):
         """Admin operations menu"""
@@ -323,87 +448,151 @@ class CLIUniApp:
                 print("Invalid choice. Please try again.")
     
     def _view_all_students(self):
-        """View all registered students"""
-        # Create a temporary admin instance for operations
+        """View all registered students (formatted exactly like screenshot)"""
         admin = Admin("admin", "System Admin", "IT Department")
         students_info = admin.view_students(self.students)
-        
+
         if not students_info:
-            print("No students found.")
+            print( "< Nothing to Display >  " + Style.RESET_ALL)
             return
-        
-        print("\nAll Registered Students:")
-        print("-" * 80)
-        print(f"{'Student ID':<12} {'Name':<25} {'Email':<30} {'Enrollments':<12}")
-        print("-" * 80)
-        
+
+    
+        print(Fore.YELLOW + "Student list" + Style.RESET_ALL)
+
+    
         for student_info in students_info:
-            print(f"{student_info['student_id']:<12} {student_info['name']:<25} {student_info['email']:<30} {student_info['enrollment_count']:<12}")
+            print(                
+                 f"{student_info['name']} :: {student_info['student_id']} --> "
+                +f"Email: {student_info['email']}"
+                + Style.RESET_ALL
+            )
+
     
     def _view_students_by_grade(self):
-        """View students organized by grade"""
-        # Create a temporary admin instance for operations
+        """View students organized by grade (formatted exactly like screenshot)"""
         admin = Admin("admin", "System Admin", "IT Department")
         grade_groups = admin.view_by_grade(self.students)
-        
-        print("\nStudents Organized by Grade:")
-        print("=" * 60)
-        
+
+    
+        print(Fore.YELLOW + "Grade Grouping" + Style.RESET_ALL)
+        if not any(grade_groups.values()):
+            print( "< Nothing to Display >" + Style.RESET_ALL)
+            return
+    
         for grade, students in grade_groups.items():
             if students:
-                print(f"\n{grade} Grade Students:")
-                print("-" * 40)
-                print(f"{'Student ID':<12} {'Name':<20} {'Subject':<10} {'Mark':<6}")
-                print("-" * 40)
-                
                 for student in students:
-                    print(f"{student['student_id']:<12} {student['name']:<20} {student['subject_id']:<10} {student['mark']:<6}")
+                
+                    mark_value = student.get("mark", "")
+                    try:
+                        mark_value = float(mark_value)
+                        mark_text = f"{mark_value:.2f}"
+                    except (ValueError, TypeError):
+                        mark_text = str(mark_value)
+
+                
+                    print(
+                        Fore.CYAN
+                        + f"{grade} --> "
+                        + Fore.WHITE
+                        + f"({student['name']} :: {student['student_id']} --> "                       
+                        + f"GRADE:  {grade} = MARK: {mark_text})"
+                        + Style.RESET_ALL
+                    )
+
+
     
     def _categorize_students(self):
-        """Categorize students into PASS/FAIL"""
-        # Create a temporary admin instance for operations
+        """Categorize students into PASS/FAIL (auto-generate grade, same logic as _view_students_by_grade)"""
         admin = Admin("admin", "System Admin", "IT Department")
         categories = admin.categorize_pass_fail(self.students)
+
+    
+        print(Fore.YELLOW + "PASS/FAIL Partition" + Style.RESET_ALL)
         
-        print("\nStudents Categorized by PASS/FAIL:")
-        print("=" * 50)
+    
+        for status in ["FAIL", "PASS"]:
+            students = categories.get(status, [])
+            if not students:
+                print(      f"{status} --> []" + Style.RESET_ALL)
+                continue
+
+            formatted_students = []
+            for student in students:
+                mark_value = student.get("mark", "")
+                try:
+                    mark_value = float(mark_value)
+                    mark_text = f"{mark_value:.2f}"
+                except (ValueError, TypeError):
+                    mark_value = None
+                    mark_text = "N/A"
+
+            
+                if mark_value is not None:
+                    if mark_value < 50:
+                        grade = "Z"
+                    elif mark_value < 65:
+                        grade = "P"
+                    elif mark_value < 75:
+                        grade = "C"
+                    elif mark_value < 85:
+                        grade = "D"
+                    else:
+                        grade = "HD"
+                else:
+                    grade = "N/A"
+
+                formatted_students.append(
+                    f"{student['name']} :: {student['student_id']} --> GRADE:  {grade} - MARK: {mark_text}"
+                )
+
         
-        for status, students in categories.items():
-            if students:
-                print(f"\n{status} Students:")
-                print("-" * 30)
-                print(f"{'Student ID':<12} {'Name':<20} {'Subject':<10} {'Mark':<6}")
-                print("-" * 30)
-                
-                for student in students:
-                    print(f"{student['student_id']:<12} {student['name']:<20} {student['subject_id']:<10} {student['mark']:<6}")
+            student_str = ", ".join(formatted_students)
+            
+            print(Fore.CYAN + f"{status} --> " + Fore.WHITE + f"[{student_str}]" + Style.RESET_ALL)
+
+
+
+
+
     
     def _remove_student(self):
-        """Remove individual student"""
-        # Create a temporary admin instance for operations
+        """Remove individual student (formatted exactly like screenshot)"""
         admin = Admin("admin", "System Admin", "IT Department")
-        student_id = input("Enter student ID to remove: ").strip()
-        
+
+    
+        student_id = input("Remove by ID: " + Style.RESET_ALL).strip()
+
+    
         if admin.remove_student(student_id, self.students):
             self.data_manager.save_data(self.students)
-            print(f"Student {student_id} removed successfully!")
+        
+            print(Fore.YELLOW + f"Removing Student {student_id} Account" + Style.RESET_ALL)
         else:
-            print("Student not found.")
+        
+            print(Fore.RED + f"Student {student_id} does not exist" + Style.RESET_ALL)
+
     
     def _clear_all_data(self):
-        """Clear entire students.data file"""
-        # Create a temporary admin instance for operations
+        """Clear entire students.data file (formatted exactly like screenshot)"""
         admin = Admin("admin", "System Admin", "IT Department")
-        confirm = input("Are you sure you want to clear all data? (yes/no): ").strip().lower()
-        
-        if confirm == "yes":
+
+    # 黄色标题，与截图一致
+        print(Fore.YELLOW + "Clearing students database" + Style.RESET_ALL)
+
+    # 红色确认提示
+        confirm = input(Fore.RED + "Are you sure you want to clear the database (Y)ES/(N)O: " + Style.RESET_ALL).strip().lower()
+    # 逻辑判断
+        if confirm == "y":
             if admin.clear_all(self.students):
                 self.data_manager.clear_data()
-                print("All data cleared successfully!")
+                print( Fore.YELLOW + "students data cleared" + Style.RESET_ALL)
             else:
-                print("Failed to clear data.")
-        else:
-            print("Operation cancelled.")
+                print(Fore.RED + "Failed to clear data." + Style.RESET_ALL)
+       
+        # 红色提示（与截图风格一致）
+           
+
 
 
 if __name__ == "__main__":
