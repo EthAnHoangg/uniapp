@@ -147,7 +147,7 @@ class CLIUniApp:
     def _student_registration(self):
         """Handle student registration"""
         indent = "      "
-        print("\n" + indent + self._c("Student Sign Up", self.Color.GREEN))
+        print(indent + self._c("Student Sign Up", self.Color.GREEN))
         
         # Ask for email and password, loop until formats are acceptable
         while True:
