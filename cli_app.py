@@ -186,7 +186,7 @@ class CLIUniApp:
         
         # Save to file
         if self.data_manager.save_data(self.students):
-            print(f"Registration successful! Your student ID is: {student_id}")
+            pass  # Registration successful - no message displayed
         else:
             print("Registration failed. Please try again.")
             self.students.remove(new_student)
@@ -267,7 +267,7 @@ class CLIUniApp:
         enrollments = current_student.view_enrollments()
         
         indent = "            "
-        print(indent + f"Showing {len(enrollments)} subjects")
+        print(indent + self._c(f"Showing {len(enrollments)} subjects", self.Color.YELLOW))
         for enrollment in enrollments:
             subject_id = enrollment['subject_id']
             mark = enrollment['mark']
@@ -385,11 +385,11 @@ class CLIUniApp:
         admin = Admin("admin", "System Admin", "IT Department")
         indent = "      "
         print(indent + self._c("Clearing students database", self.Color.YELLOW))
-        confirm = input(indent + "Are you sure you want to clear the database (Y)ES/(N)O: ").strip().lower()
+        confirm = input(indent + self._c("Are you sure you want to clear the database (Y)ES/(N)O: ", self.Color.RED)).strip().lower()
         if confirm == "y" or confirm == "yes":
             if admin.clear_all(self.students):
                 self.data_manager.clear_data()
-                print(indent + "Students data cleared")
+                print(indent + self._c("Students data cleared", self.Color.YELLOW))
             else:
                 print(indent + "Failed to clear data.")
 
