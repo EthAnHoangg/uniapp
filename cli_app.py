@@ -294,7 +294,7 @@ class CLIUniApp:
         
         # Validate new password format
         if not self.validation_service.validate_password(new_password):
-            print(self._c("Incorrect password format", self.Color.RED))
+            print(indent + self._c("Incorrect password format", self.Color.RED))
             return
         
         # Apply change directly without asking for the old password
