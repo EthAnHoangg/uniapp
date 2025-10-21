@@ -49,6 +49,7 @@ class Admin:
                         'name': student.name,
                         'subject_id': enrollment.subject_id,
                         'mark': str(enrollment.mark),
+                        'grade': enrollment.grade,
                         'status': 'PASS'
                     })
                 else:
@@ -57,6 +58,7 @@ class Admin:
                         'name': student.name,
                         'subject_id': enrollment.subject_id,
                         'mark': str(enrollment.mark),
+                        'grade': enrollment.grade,
                         'status': 'FAIL'
                     })
         return {'PASS': pass_students, 'FAIL': fail_students}
